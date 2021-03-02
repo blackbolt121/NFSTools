@@ -3,6 +3,8 @@ import time
 from os import system
 from platform import system as sys
 import netifaces
+from os import listdir
+from os.path import isfile, join
 BLACK = '\033[30m'
 RED = '\033[31m'
 GREEN = '\033[32m'
@@ -12,6 +14,9 @@ MAGENTA = '\033[35m'
 CYAN = '\033[36m'
 WHITE = '\033[37m'
 RESET = '\033[39m'
+def ls(ruta = '.'):
+    return [arch for arch in listdir(ruta) if isfile(join(ruta, arch))]
+
 class NFSTools:
     def __init__(self):
         self._clientes = []
@@ -68,7 +73,8 @@ class NFSTools:
                         select = int(input("N° Interfaz: "))
                 #Se cierra el bucle y agrega la interfaz correcta
                 #Abrimos creamos el archivo y lo editamos
-                with open('00-instaler-config.yaml','w') as ip:
+                path = ls('/etc/netplan')
+                with open(str(path[0]),'w') as ip:
                     file_content = "network:\n  version 2\n  ethernets:\n    {0}:\n      dhcp4: no\n      dhcp6: no\n      addresses: [{1}/{2}]\n      gateway4: {3}\n      nameservers:\n        "                                            .format(self._interface,self._ip,self._netmask,self._gateway)
                     #Creamos el formato adecuado para colocar los servidores DNS y validamos que sean correctos
                     dns_conf = "addresses: ["
@@ -85,14 +91,13 @@ class NFSTools:
                 print("Error al abrir archivo")
             except FileNotFoundError:
                 print("Error al crear archivo")
-            system('mv 00-installer-config.yaml /etc/netplan')
             system('netplan try')
             system('netplan apply')
             system('systemctl restart networking')
             print("Configuracion realizada con exito....")
             self.limpiarPantalla()
     def crear_carpeta(self):
-        
+
         self.limpiarPantalla()
         pass
     def archivo_exports_clientes(self):
