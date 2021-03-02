@@ -87,7 +87,7 @@ class NFSTools:
                     ip.write(file_content)
                     ip.close()
                 print('mv 01-network-manager-all.yaml '+path[0])
-                system('mv 01-network-manager-all.yaml '+path[0])
+                system('mv 01-network-manager-all.yaml /etc/netplan/01-network-manager-all.yaml')
                 print("Archivo creado exitosamente!!!")
                 time.sleep(3)
             except FileExistsError:
