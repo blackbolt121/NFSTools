@@ -26,15 +26,16 @@ class NFSTools:
         self._dns = []
         self._interface = ""
     def instalacion_paquetes_ubuntu(self):
-        print(GREEN+"Instalación paquetes ubuntu")
-        system('apt-get update')
-        system('apt-get install nfs-kernel-server')
-        print(GREEN+'Instalacion terminada...'+WHITE)
-        time.sleep(2)   
+        if self.isLinuxPlatform():
+            system("clear")
+            print(GREEN+"Instalación paquetes ubuntu")
+            system('apt-get update')
+            system('apt-get install nfs-kernel-server')
+            print(GREEN+'Instalacion terminada...'+WHITE)
+            time.sleep(2)   
         self.limpiarPantalla()    
     def config_ip(self):
         self.limpiarPantalla()
-        
         if self.isLinuxPlatform() == True:
             try:
                 interfaces = netifaces.interfaces()
@@ -104,13 +105,24 @@ class NFSTools:
         self.limpiarPantalla()
         pass
     def archivo_exports_clientes(self):
-
+        
         self.limpiarPantalla()
         pass
     def configurarFirewall(self):
         self.limpiarPantalla()
+        print(GREEN+"ACTIVANDO FIREWALL")
+        system("ufw enable")
+        system("ufw status")
+        system("ufw allow 2049")
+        print("LISTO.....")
+        time.sleep(2)
+        self.limpiarPantalla()
         pass
     def activarServidor(self):
+        self.limpiarPantalla()
+        system(GREEN+"systemctl restart nfs-kernel-server")
+        print("Servicio activado")
+        time.sleep(2)
         self.limpiarPantalla()
         pass
     def configurarCliente(self):
