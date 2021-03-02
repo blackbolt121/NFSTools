@@ -74,6 +74,7 @@ class NFSTools:
                 #Se cierra el bucle y agrega la interfaz correcta
                 #Abrimos creamos el archivo y lo editamos
                 path = ls('/etc/netplan')
+                print(path)
                 with open(str(path[0]),'w') as ip:
                     file_content = "network:\n  version 2\n  ethernets:\n    {0}:\n      dhcp4: no\n      dhcp6: no\n      addresses: [{1}/{2}]\n      gateway4: {3}\n      nameservers:\n        "                                            .format(self._interface,self._ip,self._netmask,self._gateway)
                     #Creamos el formato adecuado para colocar los servidores DNS y validamos que sean correctos
