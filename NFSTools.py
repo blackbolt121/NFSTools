@@ -75,7 +75,7 @@ class NFSTools:
                 #Abrimos creamos el archivo y lo editamos
                 path = ls('/etc/netplan')
                 print(path)
-                with open('conf.yaml','w') as ip:
+                with open('01-network-manager-all.yaml','w') as ip:
                     file_content = "network:\n  version 2\n  ethernets:\n    {0}:\n      dhcp4: no\n      dhcp6: no\n      addresses: [{1}/{2}]\n      gateway4: {3}\n      nameservers:\n        "                                            .format(self._interface,self._ip,self._netmask,self._gateway)
                     #Creamos el formato adecuado para colocar los servidores DNS y validamos que sean correctos
                     dns_conf = "addresses: ["
@@ -86,8 +86,8 @@ class NFSTools:
                     file_content = file_content + dns_conf
                     ip.write(file_content)
                     ip.close()
-                print('mv conf.yaml '+path[0])
-                system('mv conf.yaml '+path[0])
+                print('mv 01-network-manager-all.yaml '+path[0])
+                system('mv 01-network-manager-all.yaml '+path[0])
                 print("Archivo creado exitosamente!!!")
                 time.sleep(3)
             except FileExistsError:
