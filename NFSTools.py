@@ -140,7 +140,7 @@ class NFSTools:
     def crear_carpeta(self):
         bandera = True
         while bandera:
-            nombre = "Nombre de la carpeta: "
+            nombre = input("Nombre de la carpeta: ")
             if nombre in (self._carpetas):
                 print("La carpeta ya esta en el directorio....")
             else:
@@ -213,7 +213,8 @@ class NFSTools:
         pass
     def exec(self,strn, color = WHITE):
         print(strn)
-        system(WHITE + strn)
+        print(color+"", end = "")
+        system(strn)
         time.sleep(0.3)
     def saveConfig(self):
         with open("conf.pickle", "wb") as f:
