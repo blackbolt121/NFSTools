@@ -42,14 +42,14 @@ def validar(strn):
                 return True
 class NFSTools:
     def __init__(self):
-        self._relaciones = set()
-        self._carpetas = set()
+        self._relaciones = []
+        self._carpetas = []
         self._clientes = []
         self._ip = ""
         self._netmask = ""
         self._gateway = ""
-        self._dns = set()
-        self._clientes = set()
+        self._dns = []
+        self._clientes = []
         self._interface = ""
     def instalacion_paquetes_ubuntu(self):
         if self.isLinuxPlatform():
@@ -106,7 +106,8 @@ class NFSTools:
         band = True
         while band == True:
             ip_dns = input("Digite la ip del servidor DNS: ")
-            self._dns.add(ip_dns)
+            if not(ip_dns in self._dns):
+                self._dns.append(ip_dns)
             band = validar("Desea gregar otro DNS (S/N): ")
     def setInterface(self):
         #Funcion para seleccionar una interfaz de red
@@ -145,7 +146,7 @@ class NFSTools:
                 self.exec('mkdir -p /var/nfs/{0}'.format(nombre))
                 self.exec('chown nobody:nogroup /var/nfs/{0}'.format(nombre))
                 self.exec('chmod 777 -R /var/nfs/{0}'.format(nombre))
-                self._carpetas.add('/var/nfs/' + nombre)
+                self._carpetas.append('/var/nfs/' + nombre)
             bandera = validar("Desea agregar una carpeta (S/N)")
             self.limpiarPantalla()     
     def agregarClientes(self):
@@ -154,7 +155,7 @@ class NFSTools:
         while bandera:
             ip_cliente = input('Digite la ip del cliente: ')
             if not(ip_cliente in self._clientes):
-                self._clientes.add(ip_cliente)
+                self._clientes.append(ip_cliente)
             else:
                 print("El cliente ya se encuentra agregado a la lista")
             bandera = validar("Desea agregar otro cliente (S/N): ")
@@ -174,7 +175,9 @@ class NFSTools:
             #Se puede mejorar la validacion
             x = int(input("Digite el numero de carpeta: "))
             y = int(input("Digite el numero de la ip mostrado el el menu por seleccionar: "))
-            self._relaciones.add(tuple(list(self._clientes)[x],list(self._carpetas)[y],"rw"))
+            relacion = tuple(list(self._clientes)[x],list(self._carpetas)[y],"rw")
+            if not(relacion in self._relaciones):
+                self._relaciones.append(relacion)
             bandera = validar("Desea agregar un cliente a una carpeta (S/N): ")
         
         with open("/etc/exports","w") as f:
