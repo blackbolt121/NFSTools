@@ -70,12 +70,8 @@ class NFSTools:
         self.limpiarPantalla()
         if self.isLinuxPlatform() == True:
             self.setProperties()
-            self.createIPFile()
-            system('netplan try')
-            system('netplan apply')
-            system('systemctl restart networking')
-            print("Configuracion realizada con exito....")
             self.limpiarPantalla()
+            self.cambiarIP()
     def createIPFile(self):
         try:
             path = ls('/etc/netplan')
@@ -206,57 +202,58 @@ class NFSTools:
             self.crear_carpeta()
         if validar("Desea agregar clientes (S/N): "):      
             self.agregarClientes()
-        if len(self._clientes) > 0 and len(self._carpetas) > 0:
-            bandera = True     
-            aux = self._relaciones
-            while bandera:
+        if validar("Desea crear relaciones (S/N): "):
+            if len(self._clientes) > 0 and len(self._carpetas) > 0:
+                bandera = True     
+                aux = self._relaciones
+                while bandera:
 
-                self.limpiarPantalla()
-                impresion()
-                #Se puede mejorar la validacion
-                relacion = list()
-                band = True
-                while band:
-                    try:
-                        x = int(input("Digite el numero de carpeta: "))
-                        relacion.append(self._carpetas[x-1])
-                        band = False
-                    except IndexError:
-                        band = True
+                    self.limpiarPantalla()
+                    impresion()
+                    #Se puede mejorar la validacion
+                    relacion = list()
+                    band = True
+                    while band:
+                        try:
+                            x = int(input("Digite el numero de carpeta: "))
+                            relacion.append(self._carpetas[x-1])
+                            band = False
+                        except IndexError:
+                            band = True
 
-                band = True
+                    band = True
 
-                while band:
-                    try:
-                        y = int(input("Digite el numero de la ip del cliente, mostrado en el menu: "))
-                        relacion.append(self._clientes[y-1])
-                        band = False
-                    except IndexError:
-                        band = True
+                    while band:
+                        try:
+                            y = int(input("Digite el numero de la ip del cliente, mostrado en el menu: "))
+                            relacion.append(self._clientes[y-1])
+                            band = False
+                        except IndexError:
+                            band = True
 
-                relacion.append("rw,sync,no_root_squash,no_subtree_check")
+                    relacion.append("rw,sync,no_root_squash,no_subtree_check")
 
-                if not(inList(relacion, aux)):
-                    print("Relacion agregada....")
-                else:
-                    print("relacion existente....")
-                
-                bandera = validar("Desea agregar un cliente a una carpeta (S/N): ")
-                self._relaciones = aux
-            print("Creando archivo")
-            time.sleep(3)
-            with open('/etc/exports','w') as f:
-                for t in aux:
-                    f.write("{0} {1}({2})".format(t[0],t[1],t[2]))
-                    f.write("\n")
-                f.close()
-            print("Archivo editado correctamente....")
-            if validar("Desea activar el servicio NFS (S/N): "):
-                self.activarServidor()
-                print(YELLOW+"Estatus del servidor...")
-                self.exec("systemctl status nfs-kernel-server")
-                time.sleep(5)
-            time.sleep(3)
+                    if not(inList(relacion, aux)):
+                        print("Relacion agregada....")
+                    else:
+                        print("relacion existente....")
+
+                    bandera = validar("Desea agregar un cliente a una carpeta (S/N): ")
+                    self._relaciones = aux
+        print("Creando archivo")
+        time.sleep(3)
+        with open('/etc/exports','w') as f:
+            for t in self._relaciones:
+                f.write("{0} {1}({2})".format(t[0],t[1],t[2]))
+                f.write("\n")
+            f.close()
+        print("Archivo editado correctamente....")
+        if validar("Desea activar el servicio NFS (S/N): "):
+            self.activarServidor()
+            print(YELLOW+"Estatus del servidor...")
+            self.exec("systemctl status nfs-kernel-server")
+            time.sleep(5)
+        time.sleep(3)
         self.limpiarPantalla()
     def configurarFirewall(self):
         self.limpiarPantalla()
@@ -318,6 +315,15 @@ class NFSTools:
         except FileNotFoundError:
             pass
         pass
+    def cambiarIP(self):
+        if len(self._ip) > 0 and len(self._netmask) > 0 and len(self._gateway) > 0 and len(self._interface) > 0 and len(self._dns) > 0:
+            self.createIPFile()
+            self.exec('netplan try')
+            self.exec('netplan apply')
+            self.exec('systemctl restart networking')
+            print("Configuracion realizada con exito....")
+        else:
+            print("Falta configurar parametros...")
     def imprimirSubMenu(self):
         print(YELLOW+"""    
        _   _______________________  ____  __   _____
@@ -337,6 +343,7 @@ class NFSTools:
    [8]   -->ELIMANR RELACION
    [9]   -->ELIMINAR CLIENTE
    [10]  -->ELIMINAR CARPETA
+   [11]  -->Volver al Menu
         """+WHITE)
     def imprimirMenu(self):
         print(YELLOW+"""    
@@ -400,7 +407,63 @@ class NFSTools:
         self.limpiarPantalla()
         m.saveConfig()
     def submenu(self):
-        self.imprimirSubMenu()
+        """ 
+       _   _______________________  ____  __   _____
+      / | / / ____/ ___/_  __/ __ \\/ __ \\/ /  / ___/
+     /  |/ / /_   \\__ \\ / / / / / / / / / /   \\__ \\ 
+    / /|  / __/  ___/ // / / /_/ / /_/ / /______/ /  
+   /_/ |_/_/    /____//_/  \\____/\\____/_____/____/
+
+                    <<<<cONFIGURACIONES ADICIONALES>>>>   
+   [1]   -->CAMBIAR DIRECCION IP EN LA CONFIGURACION
+   [2]   -->CAMBIAR SUBMASCARA DE RED EN LA CONFIGURACION
+   [3]   -->CAMBAIAR GATEWAY  EN LA CONFIGRUACION
+   [4]   -->CAMBIAR SERVIDORES DNS EN LA CONFIGURACION
+   [5]   -->CAMBIAR INTERFAZ DE RED EN LA CONFIGURACION
+   [6]   -->AGREGAR CLIENTES EN LA CONFIGURACION
+   [7]   -->AGREGAR CARPETAS EN LA CONFIGURACION
+   [8]   -->ELIMANR RELACION
+   [9]   -->ELIMINAR CLIENTE
+   [10]  -->ELIMINAR CARPETA
+        """
+        rep = True
+        while rep == True:
+            try:
+                self.imprimirSubMenu()
+                op = int(input(WHITE+"----->"))
+                if op == 1:
+                    self.setIP()
+                elif op == 2:
+                    self.setNetmask()
+                elif op == 3:
+                    self.setGw()
+                elif op == 4:
+                    self.setDNS()
+                elif op == 5:
+                    self.setInterface()
+                elif op == 6:
+                    self.agregarClientes()
+                elif op == 7:
+                    self.crear_carpeta()
+                elif op == 8:
+                    print("Aun sin funcionar")
+                    pass
+                elif op == 9:
+                    print("Aun sin funcionar")
+                    pass
+                elif op == 10:
+                    print("Aun sin funcionar")
+                elif op == 11:
+                    rep = False
+                else:
+                    raise ValueError
+            except ValueError:
+                self.limpiarPantalla()
+                print(RED+"Digite una opción valida ........"+WHITE)
+                rep = False
+                time.sleep(1)
+                self.menu()
+        self.limpiarPantalla()
         print("En construccion....")
         time.sleep(4)
         pass
