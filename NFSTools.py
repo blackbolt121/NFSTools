@@ -323,6 +323,9 @@ class NFSTools:
    [5]   -->CAMBIAR INTERFAZ DE RED EN LA CONFIGURACION
    [6]   -->AGREGAR CLIENTES EN LA CONFIGURACION
    [7]   -->AGREGAR CARPETAS EN LA CONFIGURACION
+   [8]   -->ELIMANR RELACION
+   [9]   -->ELIMINAR CLIENTE
+   [10]  -->ELIMINAR CARPETA
         """+WHITE)
     def imprimirMenu(self):
         print(YELLOW+"""    
@@ -383,8 +386,9 @@ class NFSTools:
         self.limpiarPantalla()
         m.saveConfig()
     def submenu(self):
-        self.submenu()
+        self.imprimirSubMenu()
         print("En construccion....")
+        time.sleep(4)
         pass
 m = NFSTools()
 if validar("Desea cargar las configuraciones (S/N): "):
