@@ -40,6 +40,12 @@ def validar(strn):
                 return False
             elif op == 'S' or op == 's':
                 return True
+def inList(x, l = list()):
+    for n in l:
+        if n == x:
+            return True
+    l.append(x)
+    return False
 class NFSTools:
     def __init__(self):
         self._relaciones = list()
@@ -140,31 +146,35 @@ class NFSTools:
     def crear_carpeta(self):
         self.limpiarPantalla() 
         bandera = True
+        aux = self._carpetas
         while bandera:
             nombre = str(input("Nombre de la carpeta: "))
-            if not(nombre in self._carpetas):
+            if not(inList('/var/nfs/{0}'.format(nombre), aux)):
                 self.exec('mkdir -p /var/nfs/{0}'.format(nombre))
                 self.exec('chown nobody:nogroup /var/nfs/{0}'.format(nombre))
                 self.exec('chmod 777 -R /var/nfs/{0}'.format(nombre))
-                self._carpetas.append('/var/nfs/' + nombre)
-                print(self._carpetas)
+                print(GREEN+'+++++Carpeta agregada'+WHITE)
+            else:
+                print(RED+'-----Carpeta en existencia'+WHITE)
             bandera = validar("Desea agregar una carpeta (S/N)")
             self.limpiarPantalla()     
+        self._carpetas = aux
     def agregarClientes(self):
         self.limpiarPantalla()
         bandera = True
+        aux = self._clientes
         while bandera:
             ip_cliente = str(input('Digite la ip del cliente: '))
-            if not(ip_cliente in self._clientes):
-                self._clientes.append(ip_cliente)
-                print(self._clientes)
+            if not(inList(ip_cliente, aux)):
+                print(GREEN+"+++++Cliente agregado"+WHITE)
             else:
-                print("El cliente ya se encuentra agregado a la lista")
+                print(RED+"-----El cliente ya se encuentra agregado a la lista"+WHITE)
             bandera = validar("Desea agregar otro cliente (S/N): ")
+        self._clientes = aux
     def archivo_exports_clientes(self):
         def impresion():
-            print("Clientes disponibles")
-            a = 0
+            print("N  Clientes disponibles")
+            a = 1
             for x in self._clientes:
                 print("{0}.- {1}".format(a,x))
                 a = a + 1
@@ -177,21 +187,37 @@ class NFSTools:
         self.crear_carpeta()        
         self.agregarClientes()
         bandera = True     
-
+        aux = self._relaciones
         while bandera:
             self.limpiarPantalla()
             impresion()
             #Se puede mejorar la validacion
-            x = int(input("Digite el numero de carpeta: "))
-            y = int(input("Digite el numero de la ip mostrado el el menu por seleccionar: "))
+            
+            
             relacion = list()
-            relacion.append(self._clientes[x])
-            relacion.append(self._carpetas[y])
+            band = True
+            while band:
+                try:
+                    x = int(input("Digite el numero de carpeta: "))
+                    relacion.append(self._carpetas[x-1])
+                    band = False
+                except IndexError:
+                    band = True
+            band = True
+            while band:
+                try:
+                    y = int(input("Digite el numero de la ip del cliente, mostrado en el menu: "))
+                    relacion.append(self._clientes[y-1])
+                    band = False
+                except IndexError:
+                    band = True
             relacion.append("rw")
-            if not(relacion in self._relaciones):
-                self._relaciones.append(relacion)
+            if not(inList(relacion, aux)):
+                print("Relacion agregada....")
+            else:
+                print("relacion existente....")
             bandera = validar("Desea agregar un cliente a una carpeta (S/N): ")
-        
+        self._relaciones = aux
         with open("/etc/exports","w") as f:
             for x in self._relaciones:
                 f.write("{1} {0}({2})\n".format(x[0],x[1],x[2]))
