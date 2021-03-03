@@ -142,7 +142,17 @@ class NFSTools:
         self.setDNS()
         self.setInterface()
     def __str__(self):
-        return self._ip + self._netmask + "\n" + self._gateway + "\n" + self._interface + '\n' + str(self._dns)
+
+        string = "Direccion IP: " + self._ip + "/" +self._netmask + "\n"
+        string = string + "Gateway: " + self._gateway + "\n"
+        string = string + "Interfaz configurada: " + self._interface + '\n'
+        string = string + "Servidores DNS: \n"
+        for x in self._dns:
+            string = string + "\t" + str(x) + "\n"
+        string = string + "IP de clientes agregados: "
+        for x in self._clientes:
+            string = string + "\t" + str(x) + "\n"
+        return string
     def crear_carpeta(self):
         self.limpiarPantalla() 
         bandera = True
@@ -173,53 +183,69 @@ class NFSTools:
         self._clientes = aux
     def archivo_exports_clientes(self):
         def impresion():
-            print("N    Clientes disponibles")
-            a = 1
-            for x in self._clientes:
-                print("{0}.- {1}".format(a,x))
-                a = a + 1
-            a = 1
-            print("N    Carpetas disponibles")
-            for x in self._carpetas:
-                print("{0}.- {1}".format(a,x))
-                a = a + 1
-        self.crear_carpeta()        
-        self.agregarClientes()
-        bandera = True     
-        aux = self._relaciones
-        while bandera:
-            self.limpiarPantalla()
-            impresion()
-            #Se puede mejorar la validacion
-            relacion = list()
-            band = True
-            while band:
-                try:
-                    x = int(input("Digite el numero de carpeta: "))
-                    relacion.append(self._carpetas[x-1])
-                    band = False
-                except IndexError:
-                    band = True
-            band = True
-            while band:
-                try:
-                    y = int(input("Digite el numero de la ip del cliente, mostrado en el menu: "))
-                    relacion.append(self._clientes[y-1])
-                    band = False
-                except IndexError:
-                    band = True
-            relacion.append("rw")
-            if not(inList(relacion, aux)):
-                print("Relacion agregada....")
+            if len(self._clientes) > 0 and len(self._carpetas) > 0:
+                print("N    Clientes disponibles")
+                a = 1
+                for x in self._clientes:
+                    print("{0}.- {1}".format(a,x))
+                    a = a + 1
+                a = 1
+                print("N    Carpetas disponibles")
+                for x in self._carpetas:
+                    print("{0}.- {1}".format(a,x))
+                    a = a + 1
             else:
-                print("relacion existente....")
-            bandera = validar("Desea agregar un cliente a una carpeta (S/N): ")
-        self._relaciones = aux
+                print(RED+"CLIENTES O CARPETAS NO DISPONIBLES")
+        if validar("Desea agregar carpetas (S/N): "):
+            self.crear_carpeta()
+        if validar("Desea agregar clientes (S/N): "):      
+            self.agregarClientes()
+        if len(self._clientes) > 0 and len(self._carpetas) > 0:
+            bandera = True     
+            aux = self._relaciones
+            while bandera:
+
+                self.limpiarPantalla()
+                impresion()
+                #Se puede mejorar la validacion
+                relacion = list()
+                band = True
+                while band:
+                    try:
+                        x = int(input("Digite el numero de carpeta: "))
+                        relacion.append(self._carpetas[x-1])
+                        band = False
+                    except IndexError:
+                        band = True
+
+                band = True
+
+                while band:
+                    try:
+                        y = int(input("Digite el numero de la ip del cliente, mostrado en el menu: "))
+                        relacion.append(self._clientes[y-1])
+                        band = False
+                    except IndexError:
+                        band = True
+
+                relacion.append("rw,sync,no_root_squash,no_subtree_check")
+
+                if not(inList(relacion, aux)):
+                    print("Relacion agregada....")
+                else:
+                    print("relacion existente....")
+                bandera = validar("Desea agregar un cliente a una carpeta (S/N): ")
+            self._relaciones = aux
         with open("/etc/exports","w") as f:
             for x in self._relaciones:
                 f.write("{0}\t{1}({2})\n".format(x[0],x[1],x[2]))
                 f.close()
-        print("Archivo editado correctamente....")
+        print(GREEN+"Archivo editado correctamente....")
+        if validar("Desea activar el servicio NFS (S/N): "):
+            self.activarServidor()
+            print(YELLOW+"Estatus del servidor...")
+            self.exec("systemctl status nfs-kernel-server")
+            time.sleep(5)
         time.sleep(3)
         self.limpiarPantalla()
     def configurarFirewall(self):
@@ -281,7 +307,23 @@ class NFSTools:
         except FileNotFoundError:
             pass
         pass
+    def imprimirSubMenu(self):
+        print(YELLOW+"""    
+       _   _______________________  ____  __   _____
+      / | / / ____/ ___/_  __/ __ \\/ __ \\/ /  / ___/
+     /  |/ / /_   \\__ \\ / / / / / / / / / /   \\__ \\ 
+    / /|  / __/  ___/ // / / /_/ / /_/ / /______/ /  
+   /_/ |_/_/    /____//_/  \\____/\\____/_____/____/
 
+                    <<<<cONFIGURACIONES ADICIONALES>>>>   
+   [1]   -->CAMBIAR DIRECCION IP EN LA CONFIGURACION
+   [2]   -->CAMBIAR SUBMASCARA DE RED EN LA CONFIGURACION
+   [3]   -->CAMBAIAR GATEWAY  EN LA CONFIGRUACION
+   [4]   -->CAMBIAR SERVIDORES DNS EN LA CONFIGURACION
+   [5]   -->CAMBIAR INTERFAZ DE RED EN LA CONFIGURACION
+   [6]   -->AGREGAR CLIENTES EN LA CONFIGURACION
+   [7]   -->AGREGAR CARPETAS EN LA CONFIGURACION
+        """+WHITE)
     def imprimirMenu(self):
         print(YELLOW+"""    
        _   _______________________  ____  __   _____
@@ -297,7 +339,9 @@ class NFSTools:
    [5]   -->CONFIGURAR FIREWALL
    [6]   -->ACTIVAR SERVIDOR
    [7]   -->CONFIGURAR UN CLIENTE
-   [8]   -->SALIR   
+   [8]   -->CAMBIOS EN DATOS DEL SERVIDOR
+   [9]   -->MOSTRAR INFO DE LAS CONFIGURACIONES
+   [10]  -->SALIR   
         """+WHITE)
         pass
     def menu(self):
@@ -321,6 +365,12 @@ class NFSTools:
                 elif op == 7:
                     self.configurarCliente()
                 elif op == 8:
+                    self.submenu()
+                    pass
+                elif op == 9:
+                    print(self)
+                    pass
+                elif op == 10:
                     rep = False
                 else:
                     raise ValueError
@@ -332,6 +382,10 @@ class NFSTools:
                 self.menu()
         self.limpiarPantalla()
         m.saveConfig()
+    def submenu(self):
+        self.submenu()
+        print("En construccion....")
+        pass
 m = NFSTools()
 if validar("Desea cargar las configuraciones (S/N): "):
     try:
