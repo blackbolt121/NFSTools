@@ -462,7 +462,7 @@ class NFSTools:
                 print(RED+"Digite una opción valida ........"+WHITE)
                 rep = False
                 time.sleep(1)
-                self.menu()
+                self.submenu()
         self.limpiarPantalla()
         print("En construccion....")
         time.sleep(4)
