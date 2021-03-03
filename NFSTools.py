@@ -195,7 +195,7 @@ class NFSTools:
         
         with open("/etc/exports","w") as f:
             for x in self._relaciones:
-                f.write("{0} {1}({2})\n".format(x[0],x[1],x[2]))
+                f.write("{1} {0}({2})\n".format(x[0],x[1],x[2]))
                 f.close()
         self.limpiarPantalla()
     def configurarFirewall(self):
