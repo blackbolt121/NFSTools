@@ -386,7 +386,9 @@ class NFSTools:
                 elif op == 7:
                     self.configurarCliente()
                 elif op == 8:
+                    self.limpiarPantalla()
                     self.submenu()
+                    self.limpiarPantalla()
                     pass
                 elif op == 9:
                     self.limpiarPantalla()
@@ -425,6 +427,7 @@ class NFSTools:
    [8]   -->ELIMANR RELACION
    [9]   -->ELIMINAR CLIENTE
    [10]  -->ELIMINAR CARPETA
+   [11]  -->VOLVER AL MENU
         """
         rep = True
         while rep == True:
