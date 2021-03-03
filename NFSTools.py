@@ -45,11 +45,11 @@ class NFSTools:
         self._relaciones = []
         self._carpetas = []
         self._clientes = []
+        self._dns = []
+        self._clientes = []
         self._ip = ""
         self._netmask = ""
         self._gateway = ""
-        self._dns = []
-        self._clientes = []
         self._interface = ""
     def instalacion_paquetes_ubuntu(self):
         if self.isLinuxPlatform():
@@ -147,6 +147,7 @@ class NFSTools:
                 self.exec('chown nobody:nogroup /var/nfs/{0}'.format(nombre))
                 self.exec('chmod 777 -R /var/nfs/{0}'.format(nombre))
                 self._carpetas.append('/var/nfs/' + nombre)
+                print(self._carpetas)
             bandera = validar("Desea agregar una carpeta (S/N)")
             self.limpiarPantalla()     
     def agregarClientes(self):
@@ -156,6 +157,7 @@ class NFSTools:
             ip_cliente = input('Digite la ip del cliente: ')
             if not(ip_cliente in self._clientes):
                 self._clientes.append(ip_cliente)
+                print(self._clientes)
             else:
                 print("El cliente ya se encuentra agregado a la lista")
             bandera = validar("Desea agregar otro cliente (S/N): ")
