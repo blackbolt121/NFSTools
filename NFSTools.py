@@ -239,9 +239,9 @@ class NFSTools:
             self._relaciones = aux
             print("Creando archivo")
             time.sleep(3)
-            with open("/etc/exports","w") as f:
-                for x in self._relaciones:
-                    f.write("{0}\t{1}({2})\n".format(x[0],x[1],x[2]))
+            with open('/etc/exports','w') as f:
+                for x in aux:
+                    f.write("{0} {1}({2})\n".format(x[0],x[1],x[2]))
                     f.close()
             print("Archivo editado correctamente....")
             if validar("Desea activar el servicio NFS (S/N): "):
@@ -374,6 +374,7 @@ class NFSTools:
                     self.submenu()
                     pass
                 elif op == 9:
+                    self.limpiarPantalla()
                     print(self)
                     pass
                 elif op == 10:
