@@ -185,7 +185,10 @@ class NFSTools:
             #Se puede mejorar la validacion
             x = int(input("Digite el numero de carpeta: "))
             y = int(input("Digite el numero de la ip mostrado el el menu por seleccionar: "))
-            relacion = list(self._clientes[x],self._carpetas[y],"rw")
+            relacion = list()
+            relacion.append(self._clientes[x])
+            relacion.append(self._carpetas[y])
+            relacion.append("rw")
             if not(relacion in self._relaciones):
                 self._relaciones.append(relacion)
             bandera = validar("Desea agregar un cliente a una carpeta (S/N): ")
