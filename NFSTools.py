@@ -1,10 +1,17 @@
 #!/usr/bin/env python3
+"""
+    AUTORES: RUBEN EMMANUEL GARCIA ORDAZ - GERARDO SANTOYO BORJON
+
+
+"""
 import time
+import pickle
 from os import system
 from platform import system as sys
 import netifaces
 from os import listdir
 from os.path import isfile, join
+#Constantes de color utiles para la impresion de texto en consola
 BLACK = '\033[30m'
 RED = '\033[31m'
 GREEN = '\033[32m'
@@ -16,14 +23,33 @@ WHITE = '\033[37m'
 RESET = '\033[39m'
 def ls(ruta = '.'):
     return [arch for arch in listdir(ruta) if isfile(join(ruta, arch))]
-
+def validar(strn):
+    op = ""
+    def saveBand():
+        op = input(strn)
+        return op
+    if op == "S" or op == "N" or op == "s" or op == "n":
+        if op == "n" or op == "N":
+            return False
+        else:
+            return True
+    else:
+        while not(op == "S" or op == "N" or op == "s" or op == "n"):
+            op = saveBand()
+            if op == "n" or op == "N":
+                return False
+            elif op == 'S' or op == 's':
+                return True
 class NFSTools:
     def __init__(self):
+        self._relaciones = set()
+        self._carpetas = set()
         self._clientes = []
         self._ip = ""
         self._netmask = ""
         self._gateway = ""
-        self._dns = []
+        self._dns = set()
+        self._clientes = set()
         self._interface = ""
     def instalacion_paquetes_ubuntu(self):
         if self.isLinuxPlatform():
@@ -37,77 +63,121 @@ class NFSTools:
     def config_ip(self):
         self.limpiarPantalla()
         if self.isLinuxPlatform() == True:
-            try:
-                interfaces = netifaces.interfaces()
-                band = True
-                self._ip = input("Digite la dirección ip: ")
-                self._netmask = input("Digite la mascara de red en formato /n [(p.e: /24)]: ")
-                self._gateway = input("Digite la ip del gateway: ")
-                while band == True:
-                    def agregarOtroDNS():
-                        op = input("Desea agregar otro servidor DNS (S/N): ")
-                        return op
-                    self._dns.append(input("Digite la ip del servidor DNS: "))
-                    op = agregarOtroDNS()
-                    if op == "S" or op == "N" or op == "s" or op == "n":
-                        if op == "n" or op == "N":
-                            band = False
-                    else:
-                        while not(op == "S" or op == "N" or op == "s" or op == "n"):
-                            op = agregarOtroDNS()
-                        if op == "n" or op == "N":
-                            band = False
-                band = True
-                #Seleccionamos la interfaz
-                print("Seleccione la interfaz de red: ")
-                for x in range(0,len(interfaces)):
-                    print(str(x)+ " " + interfaces[x])
-                select = int(input("N° Interfaz: "))
-                while band:
-                    #Intentamos acceder al elemento de la lista que es de la tarjeta de red
-                    try:
-                        self._interface = str(interfaces[select])
-                        band = False
-                    except IndexError:
-                        #Obliga a seleccionar una interfaz valida
-                        band = True
-                        select = int(input("N° Interfaz: "))
-                #Se cierra el bucle y agrega la interfaz correcta
-                #Abrimos creamos el archivo y lo editamos
-                path = ls('/etc/netplan')
-                print(path)
-                with open('01-network-manager-all.yaml','w') as ip:
-                    file_content = "network:\n  version 2\n  ethernets:\n    {0}:\n      dhcp4: no\n      dhcp6: no\n      addresses: [{1}/{2}]\n      gateway4: {3}\n      nameservers:\n        "                                            .format(self._interface,self._ip,self._netmask,self._gateway)
-                    #Creamos el formato adecuado para colocar los servidores DNS y validamos que sean correctos
-                    dns_conf = "addresses: ["
-                    for x in self._dns:
-                        dns_conf = dns_conf + x +","
-                    #Cerramos el corchete de la lista
-                    dns_conf = dns_conf[0:-1] +']'
-                    file_content = file_content + dns_conf
-                    ip.write(file_content)
-                    ip.close()
-                print('mv 01-network-manager-all.yaml '+path[0])
-                system('mv 01-network-manager-all.yaml /etc/netplan/01-network-manager-all.yaml')
-                print("Archivo creado exitosamente!!!")
-                time.sleep(3)
-            except FileExistsError:
-                print("Error al abrir archivo")
-            except FileNotFoundError:
-                print("Error al crear archivo")
+            self.setProperties()
+            self.createIPFile()
             system('netplan try')
             system('netplan apply')
             system('systemctl restart networking')
             print("Configuracion realizada con exito....")
             self.limpiarPantalla()
+    def createIPFile(self):
+        try:
+            path = ls('/etc/netplan')
+            print(path)
+            with open('01-network-manager-all.yaml','w') as ip:
+                file_content = "network:\n  version 2\n  ethernets:\n    {0}:\n      dhcp4: no\n      dhcp6: no\n      addresses: [{1}/{2}]\n      gateway4: {3}\n      nameservers:\n        "                                            .format(self._interface,self._ip,self._netmask,self._gateway)
+                #Creamos el formato adecuado para colocar los servidores DNS y validamos que sean correctos
+                dns_conf = "addresses: ["
+                for x in self._dns:
+                    dns_conf = dns_conf + x +","
+                #Cerramos el corchete de la lista
+                dns_conf = dns_conf[0:-1] +']'
+                file_content = file_content + dns_conf
+                ip.write(file_content)
+                ip.close()
+            print('mv 01-network-manager-all.yaml '+ path[0])
+            system('mv 01-network-manager-all.yaml /etc/netplan/01-network-manager-all.yaml')
+            print("Archivo creado exitosamente!!!")
+            time.sleep(3)
+        except FileExistsError:
+            print("Error al abrir archivo")
+        except FileNotFoundError:
+            print("Error al crear archivo")
+    def setIP(self):
+        #Configuramos la IP de nuestro servidor
+        self._ip = input("IP: ")
+    def setNetmask(self):
+        #Guardamos la mascara de red
+        self._netmask = input("Mascara de red (numero de bits p.e 24 = 255.255.255.0): ")
+        self._netmask = '/' + self._netmask
+    def setGw(self): #Guardamos el Gateway
+        self._gateway = input("Digite la ip del gateway: ")
+    def setDNS(self):
+        #Funcion para guardar los DNS
+        band = True
+        while band == True:
+            ip_dns = input("Digite la ip del servidor DNS: ")
+            self._dns.add(ip_dns)
+            band = validar("Desea gregar otro DNS (S/N): ")
+    def setInterface(self):
+        #Funcion para seleccionar una interfaz de red
+        band = True
+        print("Seleccione la interfaz de red: ")
+        interfaces = netifaces.interfaces()
+        for x in range(0,len(interfaces)):
+            print(str(x)+ " " + interfaces[x])
+            select = int(input("N° Interfaz: "))
+            while band:
+                #Intentamos acceder al elemento de la lista que es de la tarjeta de red
+                try:
+                    self._interface = str(interfaces[select])
+                    band = False
+                except IndexError:
+                    #Obliga a seleccionar una interfaz valida
+                    band = True
+                    select = int(input("N° Interfaz: "))
+    def setProperties(self):
+        self.setIP()
+        self.setNetmask()
+        self.setGw()
+        self.setDNS()
+        self.setInterface()
+    def __str__(self):
+        return self._ip + self._netmask + "\n" + self._gateway + "\n" + self._interface + '\n' + str(self._dns)
     def crear_carpeta(self):
-
-        self.limpiarPantalla()
-        pass
+        bandera = True
+        while bandera:
+            nombre = "Nombre de la carpeta: "
+            if nombre in (self._carpetas):
+                print("La carpeta ya esta en el directorio....")
+            else:
+                self.exec('mkdir -p /var/nfs/{0}'.format(nombre))
+                self.exec('chown nobody:nogroup /var/nfs/{0}'.format(nombre))
+                self.exec('chmod 777 -R /var/nfs/{0}'.format(nombre))
+                self._carpetas.add('/var/nfs/' + nombre)
+            bandera = validar("Desea agregar una carpeta (S/N)")
+        self.limpiarPantalla()     
+    def agregarClientes(self):
+        bandera = True
+        while bandera:
+            ip_cliente = input('Digite la ip del cliente: ')
+            if not(ip_cliente in self._clientes):
+                self._clientes.add(ip_cliente)
+            else:
+                print("El cliente ya se encuentra agregado a la lista")
+            bandera = validar("Desea agregar otro cliente (S/N): ")
     def archivo_exports_clientes(self):
-        
+        def impresion():
+            print("Clientes                 Carpetas")
+            a, b = 0, 0
+            for x, y in self._clientes, self._carpetas:
+                print("{0}: {1} {2}: {3}".format(a,x,b,y))
+        self.crear_carpeta()        
+        self.agregarClientes()
+        bandera = True        
+        while bandera:
+            self.limpiarPantalla()
+            impresion()
+            #Se puede mejorar la validacion
+            x = int(input("Digite el numero de carpeta: "))
+            y = int(input("Digite el numero de la ip mostrado el el menu por seleccionar: "))
+            self._relaciones.add(tuple(list(self._clientes)[x],list(self._carpetas)[y],"rw"))
+            bandera = validar("Desea agregar un cliente a una carpeta (S/N): ")
+        with open("/etc/exports","w") as f:
+            for x in self._relaciones:
+                f.write("{0} {1}({2})\n".format(x[0],x[1],x[2]))
+                f.close()
         self.limpiarPantalla()
-        pass
     def configurarFirewall(self):
         self.limpiarPantalla()
         print(GREEN+"ACTIVANDO FIREWALL")
@@ -126,6 +196,7 @@ class NFSTools:
         self.limpiarPantalla()
         pass
     def configurarCliente(self):
+
         self.limpiarPantalla()
         pass
     def isLinuxPlatform(self):
@@ -137,8 +208,23 @@ class NFSTools:
         else:
             self.exec('clear')
         pass
-    def exec(self,strn):
-        system(strn)
+    def exec(self,strn, color = WHITE):
+        print(strn)
+        system(WHITE + strn)
+        time.sleep(0.3)
+    def saveConfig(self):
+        with open("conf.pickle", "wb") as f:
+            pickle.dump(self, f)
+    def loadConfig(self,str="conf.pickle"):
+        try:
+            with open(str, "rb") as inp:
+                obj = pickle.load(inp)
+                return obj
+        except FileExistsError:
+            pass
+        except FileNotFoundError:
+            pass
+        pass
     def imprimirMenu(self):
         print(YELLOW+"""    
        _   _______________________  ____  __   _____
@@ -156,6 +242,7 @@ class NFSTools:
    [7]   -->CONFIGURAR UN CLIENTE
    [8]   -->SALIR   
         """+WHITE)
+        pass
     def menu(self):
         rep = True
         while rep == True:
@@ -181,10 +268,14 @@ class NFSTools:
                 else:
                     raise ValueError
             except ValueError:
+                self.limpiarPantalla()
                 print(RED+"Digite una opción valida ........"+WHITE)
                 rep = False
                 time.sleep(1)
                 self.menu()
         self.limpiarPantalla()
 m = NFSTools()
+if validar("Desea cargar las configuraciones: "):
+    m = m.loadConfig()
 m.menu()
+m.saveConfig()
