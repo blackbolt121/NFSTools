@@ -99,7 +99,6 @@ class NFSTools:
     def setNetmask(self):
         #Guardamos la mascara de red
         self._netmask = input("Mascara de red (numero de bits p.e 24 = 255.255.255.0): ")
-        self._netmask = '/' + self._netmask
     def setGw(self): #Guardamos el Gateway
         self._gateway = input("Digite la ip del gateway: ")
     def setDNS(self):
