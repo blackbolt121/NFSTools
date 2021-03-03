@@ -321,6 +321,7 @@ class NFSTools:
             self.exec('netplan try')
             self.exec('netplan apply')
             self.exec('systemctl restart networking')
+            self.limpiarPantalla()
             print("Configuracion realizada con exito....")
         else:
             print("Falta configurar parametros...")
