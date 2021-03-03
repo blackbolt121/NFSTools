@@ -241,7 +241,8 @@ class NFSTools:
             time.sleep(3)
             with open('/etc/exports','w') as f:
                 for x in aux:
-                    f.write("{0} {1}({2})\n".format(x[0],x[1],x[2]))
+                    f.write("{0} {1}({2})".format(x[0],x[1],x[2]))
+                    f.write("\n")
                     f.close()
             print("Archivo editado correctamente....")
             if validar("Desea activar el servicio NFS (S/N): "):
@@ -376,6 +377,7 @@ class NFSTools:
                 elif op == 9:
                     self.limpiarPantalla()
                     print(self)
+                    self.limpiarPantalla()
                     pass
                 elif op == 10:
                     rep = False
