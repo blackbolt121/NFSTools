@@ -114,18 +114,21 @@ class NFSTools:
         band = True
         print("Seleccione la interfaz de red: ")
         interfaces = netifaces.interfaces()
-        for x in range(0,len(interfaces)):
-            print(str(x)+ " " + interfaces[x])
-            select = int(input("N° Interfaz: "))
-            while band:
+        def printInterfaces():
+            for x in range(0,len(interfaces)):
+                print(str(x)+ " " + interfaces[x])
+        printInterfaces()
+        select = int(input("N° Interfaz: "))
+        while band:
                 #Intentamos acceder al elemento de la lista que es de la tarjeta de red
-                try:
-                    self._interface = str(interfaces[select])
-                    band = False
-                except IndexError:
-                    #Obliga a seleccionar una interfaz valida
-                    band = True
-                    select = int(input("N° Interfaz: "))
+            try:
+                self._interface = str(interfaces[select])
+                band = False
+            except IndexError:
+                #Obliga a seleccionar una interfaz valida
+                band = True
+                printInterfaces()
+                select = int(input("N° Interfaz: "))
     def setProperties(self):
         self.setIP()
         self.setNetmask()
