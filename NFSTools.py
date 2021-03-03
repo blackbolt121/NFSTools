@@ -467,9 +467,6 @@ class NFSTools:
                 time.sleep(1)
                 self.submenu()
         self.limpiarPantalla()
-        print("En construccion....")
-        time.sleep(4)
-        pass
 m = NFSTools()
 if validar("Desea cargar las configuraciones (S/N): "):
     try:
