@@ -173,17 +173,16 @@ class NFSTools:
         self._clientes = aux
     def archivo_exports_clientes(self):
         def impresion():
-            print("N  Clientes disponibles")
+            print("N    Clientes disponibles")
             a = 1
             for x in self._clientes:
                 print("{0}.- {1}".format(a,x))
                 a = a + 1
-            a = 0
-            print("Carpetas disponibles")
+            a = 1
+            print("N    Carpetas disponibles")
             for x in self._carpetas:
                 print("{0}.- {1}".format(a,x))
                 a = a + 1
-            a = 0
         self.crear_carpeta()        
         self.agregarClientes()
         bandera = True     
@@ -192,8 +191,6 @@ class NFSTools:
             self.limpiarPantalla()
             impresion()
             #Se puede mejorar la validacion
-            
-            
             relacion = list()
             band = True
             while band:
@@ -220,7 +217,7 @@ class NFSTools:
         self._relaciones = aux
         with open("/etc/exports","w") as f:
             for x in self._relaciones:
-                f.write("{1} {0}({2})\n".format(x[0],x[1],x[2]))
+                f.write("{0}\t{1}({2})\n".format(x[0],x[1],x[2]))
                 f.close()
         print("Archivo editado correctamente....")
         time.sleep(3)
@@ -237,7 +234,8 @@ class NFSTools:
         pass
     def activarServidor(self):
         self.limpiarPantalla()
-        system(GREEN+"systemctl restart nfs-kernel-server")
+        print(GREEN+"",end="")
+        system("systemctl restart nfs-kernel-server")
         print("Servicio activado")
         time.sleep(2)
         self.limpiarPantalla()
