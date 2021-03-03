@@ -149,9 +149,15 @@ class NFSTools:
         string = string + "Servidores DNS: \n"
         for x in self._dns:
             string = string + "\t" + str(x) + "\n"
-        string = string + "IP de clientes agregados: "
+        string = string + "IP de clientes agregados:\n"
         for x in self._clientes:
             string = string + "\t" + str(x) + "\n"
+        string = string + "Carpetas agregadas:\n"
+        for x in self._carpetas:
+            string = string + "\t" + str(x) + "\n"
+        string = string + "Carpetas agregadas:\n"
+        for x in self._relaciones:
+            string = string + "\trelacion: {0} {1}({2})".format(x[0],x[1],x[2]) + '\n'   
         return string
     def crear_carpeta(self):
         self.limpiarPantalla() 
