@@ -163,14 +163,13 @@ class NFSTools:
             bandera = validar("Desea agregar otro cliente (S/N): ")
     def archivo_exports_clientes(self):
         def impresion():
-            print("Clientes                 Carpetas")
+            print("Clientes disponibles")
             a = 0
-            print(self._clientes)
-            print(self._carpetas)
             for x in self._clientes:
                 print("{0}.- {1}".format(a,x))
                 a = a + 1
             a = 0
+            print("Carpetas disponibles")
             for x in self._carpetas:
                 print("{0}.- {1}".format(a,x))
                 a = a + 1
@@ -197,6 +196,8 @@ class NFSTools:
             for x in self._relaciones:
                 f.write("{1} {0}({2})\n".format(x[0],x[1],x[2]))
                 f.close()
+        print("Archivo editado correctamente....")
+        time.sleep(3)
         self.limpiarPantalla()
     def configurarFirewall(self):
         self.limpiarPantalla()
@@ -216,8 +217,18 @@ class NFSTools:
         self.limpiarPantalla()
         pass
     def configurarCliente(self):
-
         self.limpiarPantalla()
+        bandera = True
+        self.exec("apt-get update")
+        self.exec("apt-install nfs-common")
+        while bandera:
+            ip_servidor = str(input("Digite la ip del servidor: "))
+            direccion_carpeta_servidor = str(input("Digite la ruta de la carpeta del servidor"))
+            direccion_carpeta_cliente = str(input("Digite la ruta de la carpeta del cliente"))
+            self.exec("mkdir -p " + direccion_carpeta_cliente)
+            self.exec("mount {0}:{1} {2}".format(ip_servidor, direccion_carpeta_servidor, direccion_carpeta_cliente))
+            bandera = validar("Desea montar otra carpeta (S/N): ")
+            self.limpiarPantalla()
         pass
     def isLinuxPlatform(self):
         name = sys()
@@ -296,8 +307,11 @@ class NFSTools:
                 time.sleep(1)
                 self.menu()
         self.limpiarPantalla()
+        m.saveConfig()
 m = NFSTools()
 if validar("Desea cargar las configuraciones (S/N): "):
-    m = m.loadConfig()
+    try:
+        m = m.loadConfig()
+    except:
+        m = NFSTools()
 m.menu()
-m.saveConfig()
