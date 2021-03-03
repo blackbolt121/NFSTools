@@ -377,6 +377,7 @@ class NFSTools:
                 elif op == 9:
                     self.limpiarPantalla()
                     print(self)
+                    input("Presione enter -------> ")
                     self.limpiarPantalla()
                     pass
                 elif op == 10:
