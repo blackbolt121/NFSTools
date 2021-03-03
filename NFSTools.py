@@ -164,11 +164,17 @@ class NFSTools:
     def archivo_exports_clientes(self):
         def impresion():
             print("Clientes                 Carpetas")
-            a, b = 0, 0
+            a = 0
             print(self._clientes)
             print(self._carpetas)
-            for x, y in self._clientes, self._carpetas:
-                print("{0}: {1} {2}: {3}".format(a,x,b,y))
+            for x in self._clientes:
+                print("{0}.- {1}".format(a,x))
+                a = a + 1
+            a = 0
+            for x in self._carpetas:
+                print("{0}.- {1}".format(a,x))
+                a = a + 1
+            a = 0
         self.crear_carpeta()        
         self.agregarClientes()
         bandera = True     
