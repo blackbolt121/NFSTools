@@ -42,11 +42,11 @@ def validar(strn):
                 return True
 class NFSTools:
     def __init__(self):
-        self._relaciones = []
-        self._carpetas = []
-        self._clientes = []
-        self._dns = []
-        self._clientes = []
+        self._relaciones = list()
+        self._carpetas = list()
+        self._clientes = list()
+        self._dns = list()
+        self._clientes = list()
         self._ip = ""
         self._netmask = ""
         self._gateway = ""
@@ -105,7 +105,7 @@ class NFSTools:
         #Funcion para guardar los DNS
         band = True
         while band == True:
-            ip_dns = input("Digite la ip del servidor DNS: ")
+            ip_dns = str(input("Digite la ip del servidor DNS: "))
             if not(ip_dns in self._dns):
                 self._dns.append(ip_dns)
             band = validar("Desea gregar otro DNS (S/N): ")
@@ -141,7 +141,7 @@ class NFSTools:
         self.limpiarPantalla() 
         bandera = True
         while bandera:
-            nombre = input("Nombre de la carpeta: ")
+            nombre = str(input("Nombre de la carpeta: "))
             if not(nombre in self._carpetas):
                 self.exec('mkdir -p /var/nfs/{0}'.format(nombre))
                 self.exec('chown nobody:nogroup /var/nfs/{0}'.format(nombre))
@@ -154,7 +154,7 @@ class NFSTools:
         self.limpiarPantalla()
         bandera = True
         while bandera:
-            ip_cliente = input('Digite la ip del cliente: ')
+            ip_cliente = str(input('Digite la ip del cliente: '))
             if not(ip_cliente in self._clientes):
                 self._clientes.append(ip_cliente)
                 print(self._clientes)
