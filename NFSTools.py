@@ -137,19 +137,19 @@ class NFSTools:
     def __str__(self):
         return self._ip + self._netmask + "\n" + self._gateway + "\n" + self._interface + '\n' + str(self._dns)
     def crear_carpeta(self):
+        self.limpiarPantalla() 
         bandera = True
         while bandera:
             nombre = input("Nombre de la carpeta: ")
-            if nombre in (self._carpetas):
-                print("La carpeta ya esta en el directorio....")
-            else:
+            if not(nombre in self._carpetas):
                 self.exec('mkdir -p /var/nfs/{0}'.format(nombre))
                 self.exec('chown nobody:nogroup /var/nfs/{0}'.format(nombre))
                 self.exec('chmod 777 -R /var/nfs/{0}'.format(nombre))
                 self._carpetas.add('/var/nfs/' + nombre)
             bandera = validar("Desea agregar una carpeta (S/N)")
-        self.limpiarPantalla()     
+            self.limpiarPantalla()     
     def agregarClientes(self):
+        self.limpiarPantalla()
         bandera = True
         while bandera:
             ip_cliente = input('Digite la ip del cliente: ')
@@ -166,7 +166,8 @@ class NFSTools:
                 print("{0}: {1} {2}: {3}".format(a,x,b,y))
         self.crear_carpeta()        
         self.agregarClientes()
-        bandera = True        
+        bandera = True     
+
         while bandera:
             self.limpiarPantalla()
             impresion()
@@ -175,6 +176,7 @@ class NFSTools:
             y = int(input("Digite el numero de la ip mostrado el el menu por seleccionar: "))
             self._relaciones.add(tuple(list(self._clientes)[x],list(self._carpetas)[y],"rw"))
             bandera = validar("Desea agregar un cliente a una carpeta (S/N): ")
+        
         with open("/etc/exports","w") as f:
             for x in self._relaciones:
                 f.write("{0} {1}({2})\n".format(x[0],x[1],x[2]))
@@ -228,6 +230,7 @@ class NFSTools:
         except FileNotFoundError:
             pass
         pass
+
     def imprimirMenu(self):
         print(YELLOW+"""    
        _   _______________________  ____  __   _____
@@ -278,7 +281,7 @@ class NFSTools:
                 self.menu()
         self.limpiarPantalla()
 m = NFSTools()
-if validar("Desea cargar las configuraciones: "):
+if validar("Desea cargar las configuraciones (S/N): "):
     m = m.loadConfig()
 m.menu()
 m.saveConfig()
