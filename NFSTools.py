@@ -165,6 +165,8 @@ class NFSTools:
         def impresion():
             print("Clientes                 Carpetas")
             a, b = 0, 0
+            print(self._clientes)
+            print(self._carpetas)
             for x, y in self._clientes, self._carpetas:
                 print("{0}: {1} {2}: {3}".format(a,x,b,y))
         self.crear_carpeta()        
