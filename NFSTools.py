@@ -234,18 +234,21 @@ class NFSTools:
                     print("Relacion agregada....")
                 else:
                     print("relacion existente....")
+                
                 bandera = validar("Desea agregar un cliente a una carpeta (S/N): ")
             self._relaciones = aux
-        with open("/etc/exports","w") as f:
-            for x in self._relaciones:
-                f.write("{0}\t{1}({2})\n".format(x[0],x[1],x[2]))
-                f.close()
-        print(GREEN+"Archivo editado correctamente....")
-        if validar("Desea activar el servicio NFS (S/N): "):
-            self.activarServidor()
-            print(YELLOW+"Estatus del servidor...")
-            self.exec("systemctl status nfs-kernel-server")
-            time.sleep(5)
+            print("Creando archivo")
+            time.sleep(3)
+            with open("/etc/exports","w") as f:
+                for x in self._relaciones:
+                    f.write("{0}\t{1}({2})\n".format(x[0],x[1],x[2]))
+                    f.close()
+            print("Archivo editado correctamente....")
+            if validar("Desea activar el servicio NFS (S/N): "):
+                self.activarServidor()
+                print(YELLOW+"Estatus del servidor...")
+                self.exec("systemctl status nfs-kernel-server")
+                time.sleep(5)
         time.sleep(3)
         self.limpiarPantalla()
     def configurarFirewall(self):
