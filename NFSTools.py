@@ -278,7 +278,7 @@ class NFSTools:
         self.limpiarPantalla()
         bandera = True
         self.exec("apt-get update")
-        self.exec("apt-install nfs-common")
+        self.exec("apt-get install nfs-common")
         while bandera:
             ip_servidor = str(input("Digite la ip del servidor: "))
             direccion_carpeta_servidor = str(input("Digite la ruta de la carpeta del servidor"))
