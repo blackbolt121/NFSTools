@@ -437,26 +437,75 @@ class NFSTools:
                 op = int(input(WHITE+"----->"))
                 if op == 1:
                     self.setIP()
+                    self.limpiarPantalla()
                 elif op == 2:
                     self.setNetmask()
+                    self.limpiarPantalla()
                 elif op == 3:
                     self.setGw()
+                    self.limpiarPantalla()
                 elif op == 4:
                     self.setDNS()
+                    self.limpiarPantalla()
                 elif op == 5:
                     self.setInterface()
+                    self.limpiarPantalla()
                 elif op == 6:
                     self.agregarClientes()
+                    self.limpiarPantalla()
                 elif op == 7:
                     self.crear_carpeta()
+                    self.limpiarPantalla()
                 elif op == 8:
-                    print("Aun sin funcionar")
+                    #print("Aun sin funcionar")
+                    if len(self._relaciones) > 0:
+                        print("Relaciones: ")
+                        for x in range(len(self._relaciones)):
+                            print("{0}: {1} {2} {3}".format(x+1,self._relaciones[x][0], self._relaciones[x][1], self._relaciones[x][2]))
+                        band = True
+                        while band:
+                            try:
+                                select = int(input("Digite el numero de la relacion que quiere eliminar: "))
+                                if validar("Estas seguro (S/N): "):
+                                    self._relaciones.remove(self._relaciones[select])
+                            except:
+                                self.limpiarPantalla()
+                                band = False
+                    self.limpiarPantalla()
                     pass
                 elif op == 9:
-                    print("Aun sin funcionar")
-                    pass
+                    band = True
+                    if len(self._clientes) > 0:
+                        while band:
+                            try:
+                                print("Clientes: ")
+                                for x in range(len(self._clientes)):
+                                    print("{0}: {1}".format(x+1,self._clientes[x]))
+                                select = int(input("Digite el numero de ciiente que quiere eliminar: "))
+                                if validar("Estas seguro (S/N): "):
+                                    self._relaciones.remove(self._relaciones[select])
+                            except:
+                                self.limpiarPantalla()
+                                band = False
+                                self.limpiarPantalla()
+                    self.limpiarPantalla()
                 elif op == 10:
-                    print("Aun sin funcionar")
+                    
+                    band = True
+                    if len(self._carpetas) > 0:
+                        while band:
+                            try:
+                                print("Carpetas")
+                                for x in range(len(self._carpetas)):
+                                    print("{0}: {1}".format(x+1,self._carpetas[x]))
+                                select = int(input("Digite el numero de carpeta que quiere eliminar: "))
+                                if validar("Estas seguro (S/N): "):
+                                    self._relaciones.remove(self._relaciones[select])
+                            except:
+                                self.limpiarPantalla()
+                                band = False
+                    self.limpiarPantalla()
+
                 elif op == 11:
                     rep = False
                 else:
