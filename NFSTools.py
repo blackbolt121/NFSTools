@@ -465,7 +465,7 @@ class NFSTools:
                         band = True
                         while band:
                             try:
-                                select = int(input("Digite el numero de la relacion que quiere eliminar: "))
+                                select = int(input("Digite el numero de la relacion que quiere eliminar: ")) - 1
                                 if validar("Estas seguro (S/N): "):
                                     self._relaciones.remove(self._relaciones[select])
                             except:
@@ -481,7 +481,7 @@ class NFSTools:
                                 print("Clientes: ")
                                 for x in range(len(self._clientes)):
                                     print("{0}: {1}".format(x+1,self._clientes[x]))
-                                select = int(input("Digite el numero de ciiente que quiere eliminar: "))
+                                select = int(input("Digite el numero de ciiente que quiere eliminar: ")) - 1
                                 if validar("Estas seguro (S/N): "):
                                     self._relaciones.remove(self._relaciones[select])
                             except:
@@ -490,7 +490,7 @@ class NFSTools:
                                 self.limpiarPantalla()
                     self.limpiarPantalla()
                 elif op == 10:
-                    
+
                     band = True
                     if len(self._carpetas) > 0:
                         while band:
@@ -498,7 +498,7 @@ class NFSTools:
                                 print("Carpetas")
                                 for x in range(len(self._carpetas)):
                                     print("{0}: {1}".format(x+1,self._carpetas[x]))
-                                select = int(input("Digite el numero de carpeta que quiere eliminar: "))
+                                select = int(input("Digite el numero de carpeta que quiere eliminar: ")) - 1
                                 if validar("Estas seguro (S/N): "):
                                     self._relaciones.remove(self._relaciones[select])
                             except:
