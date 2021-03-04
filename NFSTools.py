@@ -484,7 +484,7 @@ class NFSTools:
                                     print("{0}: {1}".format(x+1,self._clientes[x]))
                                 select = int(input("Digite el numero de ciiente que quiere eliminar: ")) - 1
                                 if validar("Estas seguro (S/N): "):
-                                    self._relaciones.remove(self._clientes[select])
+                                    self._clientes.remove(self._clientes[select])
                                 band = False
                             except:
                                 self.limpiarPantalla()
@@ -502,7 +502,7 @@ class NFSTools:
                                     print("{0}: {1}".format(x+1,self._carpetas[x]))
                                 select = int(input("Digite el numero de carpeta que quiere eliminar: ")) - 1
                                 if validar("Estas seguro (S/N): "):
-                                    self._relaciones.remove(self._carpetas[select])
+                                    self._carpetas.remove(self._carpetas[select])
                                 band = False
                             except:
                                 self.limpiarPantalla()
