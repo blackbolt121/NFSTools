@@ -468,9 +468,10 @@ class NFSTools:
                                 select = int(input("Digite el numero de la relacion que quiere eliminar: ")) - 1
                                 if validar("Estas seguro (S/N): "):
                                     self._relaciones.remove(self._relaciones[select])
+                                band = False
                             except:
                                 self.limpiarPantalla()
-                                band = False
+                                band = True
                     self.limpiarPantalla()
                     pass
                 elif op == 9:
@@ -484,9 +485,10 @@ class NFSTools:
                                 select = int(input("Digite el numero de ciiente que quiere eliminar: ")) - 1
                                 if validar("Estas seguro (S/N): "):
                                     self._relaciones.remove(self._relaciones[select])
+                                band = False
                             except:
                                 self.limpiarPantalla()
-                                band = False
+                                band = True
                                 self.limpiarPantalla()
                     self.limpiarPantalla()
                 elif op == 10:
@@ -501,9 +503,10 @@ class NFSTools:
                                 select = int(input("Digite el numero de carpeta que quiere eliminar: ")) - 1
                                 if validar("Estas seguro (S/N): "):
                                     self._relaciones.remove(self._relaciones[select])
+                                band = False
                             except:
                                 self.limpiarPantalla()
-                                band = False
+                                band = True
                     self.limpiarPantalla()
 
                 elif op == 11:
